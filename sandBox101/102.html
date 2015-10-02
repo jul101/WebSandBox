@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bootstrap</title>
+    <script src="../jQuery/jquery-1.11.3.js"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="../bootstrap/bootstrap-3.3.5-dist/css/bootstrap.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="../bootstrap/bootstrap-3.3.5-dist/css/bootstrap-theme.min.css">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="../bootstrap/bootstrap-3.3.5-dist/js/bootstrap.js"></script>
+</head>
+    <script src="js/101.js"></script>
+<style>
+    div.sample div.display{
+        overflow: auto;
+        height: 35em;
+    }
+</style>
+<body>
+<div class="container">
+    <div id="sample1" class="sample row">
+        <div class="jumbotron">
+            <h1>Sample 1:Javascript Apply And Call</h1>
+            <p>測試研究javascript的apply</p>
+            <button type="button" class="btn btn-lg btn-danger" id="execute">Go!</button>
+        </div>
+        <div class="row">
+            <div class="description col-md-6">
+
+<pre>
+function display(msg){
+    $("#displayArea").append(msg+"&lt;br&gt;\n");
+}
+var count=0;
+var ApplySample=function(){
+    display("\n\n&lt;br&gt;&lt;b&gt;count:&lt;/b&gt;"+count);
+    display("&lt;i&gt;this:&lt;/i&gt; "+this);
+    display("&lt;i&gt;this.name:&lt;/i&gt; "+this.name);
+    display("&lt;i&gt;this.age:&lt;/i&gt; "+this.age);
+    display("arguments:"+arguments.length);
+    count++;
+};
+
+var applier={
+    name:'John Doe',
+    age:10
+};
+ApplySample.apply(applier,[1,2,3]);
+ApplySample.apply();//the 'this' references window obj
+ApplySample();//same with above
+
+ApplySample.call(applier,1,2,3);
+ApplySample.call();//the 'this' references window obj
+ApplySample();//same with above
+</pre>
+            </div>
+            <div id="displayArea" class="display col-md-6">Results...</div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
