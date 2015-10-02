@@ -1,0 +1,79 @@
+/**
+當你設定一個元素樣式為 box-sizing: border-box;，這個元素的內距和邊框將不會增加元素本身的寬度
+**/
+* {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+body {
+    font-family: verdana;
+    margin: 0;
+    /*background-color: red;*/
+}
+
+div.sample div.title h1 {
+    font-size: 1.5em;
+    padding-left: .5em;
+}
+
+div.sample div.title {
+    background-color: #265a88;
+    color: white;
+    padding: 0.3em 0.3em 0.3em 0.3em;
+    border-radius: 0.5em;
+}
+
+div.sample div.display #displayArea {
+    margin: 3em 0em;
+    overflow: auto;
+    height: 30em;
+    border: 1px solid black;
+    border-right-width: 0px;
+    border-left-width: 0px;
+}
+
+div.sample div.display, div.sample div.description {
+    position: relative;
+    width: 50%;
+    float: left;
+    margin-top: 1.5em;
+    padding-left: 0.3em;
+    padding-right: 0.3em;
+}
+
+div.sample {
+    margin: 0.5em;
+}
+div.display{
+    position: relative;
+}
+.display span.end{
+    font-weight: bolder;
+    bottom: 0px;
+    right: 0em;
+}
+.display span.start
+,.display span.end{
+    position: absolute;
+    color: white;
+    background-color: #265a88;
+    padding: 0.5em;  height: 2.5em;  line-height: 1.5em;/**文字居中對齊**/
+    display: inline-block;
+    border-radius: 0.5em;
+}
+
+#execute{
+    position: absolute;
+    right: 0.5em;
+    font-weight: bolder;
+    padding: 0.5em;
+    background-color: red;
+    color: white;
+    border-top-width: 0px;
+    border-left-width: 0px;
+    cursor: pointer;
+}
+#execute:hover{
+    background-color: #c7254e;
+}
