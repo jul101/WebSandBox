@@ -1,0 +1,62 @@
+<!--
+Create By    : yc_lin
+Create Date  : 2015/10/2 上午 11:11
+Project Name : WebSandBox
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Javascript Sample</title>
+    <script src="../jQuery/jquery-1.11.3.js"></script>
+    <link rel="stylesheet" href="css/101.css">
+    <script src="js/101.js"></script>
+</head>
+<body>
+<style>
+
+</style>
+
+<div id="sample1" class="sample">
+    <div class="title"><h1>Sample 1: Javascript Apply And Call</h1></div>
+    <div class="description">
+        <p>
+            測試研究javascript的apply
+        </p>
+<pre>
+function display(msg){
+    $("#displayArea").append(msg+"&lt;br&gt;\n");
+}
+var count=0;
+var ApplySample=function(){
+    display("\n\n&lt;br&gt;&lt;b&gt;count:&lt;/b&gt;"+count);
+    display("&lt;i&gt;this:&lt;/i&gt; "+this);
+    display("&lt;i&gt;this.name:&lt;/i&gt; "+this.name);
+    display("&lt;i&gt;this.age:&lt;/i&gt; "+this.age);
+    display("arguments:"+arguments.length);
+    count++;
+};
+
+var applier={
+    name:'John Doe',
+    age:10
+};
+ApplySample.apply(applier,[1,2,3]);
+ApplySample.apply();//the 'this' references window obj
+ApplySample();//same with above
+
+ApplySample.call(applier,1,2,3);
+ApplySample.call();//the 'this' references window obj
+ApplySample();//same with above
+</pre>
+        <button id="execute">Go!</button>
+    </div>
+    <div class="display">
+        <span class="start">start</span>
+        <span class="end">end</span>
+        <div id="displayArea"></div>
+    </div>
+</div>
+
+</body>
+</html>
