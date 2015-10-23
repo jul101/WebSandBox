@@ -1,0 +1,338 @@
+<!--
+Create By    : yc_lin
+Create Date  : 2015/10/20 上午 09:07
+Project Name : WebSandBox
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sight Scene</title>
+    <script src="../jQuery/jquery-1.11.3.js"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="../bootstrap/bootstrap-3.3.5-dist/css/bootstrap.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="../bootstrap/bootstrap-3.3.5-dist/css/bootstrap-theme.min.css">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="../bootstrap/bootstrap-3.3.5-dist/js/bootstrap.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+</head>
+<body>
+<style>
+    .nodeIn{
+        border: solid thin black;
+    }
+</style>
+<div id="targetZone">
+
+</div>
+
+</body>
+</html>
+<script>
+
+
+    function SightScene(setting){
+        if(setting){
+            this.targetZone=setting.targetZone;
+            this.width=setting.width;
+            this.height=setting.height;
+            this.step=setting.step;
+        }
+        var targetZone;
+        var width,height;
+        var svg;
+        var me=this;
+        var step;
+        var baseX,baseY;
+        var strokeWidth,strokeWidthThin;
+        var filterId="drop-shadow";
+        var initial=function(){
+            targetZone = me.targetZone;
+            width = me.width||500;
+            height = me.height||500;
+            step = me.step||100;
+            strokeWidth = me.strokeWidth||3;
+            strokeWidthThin = me.strokeWidthThin||2;
+            baseX = me.baseX||50;
+            baseY = me.baseY||50;
+            svg = d3.select(targetZone)
+                    .append("svg").attr("width", width).attr("height", height);
+
+            var createFilter=function(){
+                // filters go in defs element
+                var defs = svg.append("defs");
+
+// create filter with id #drop-shadow
+// height=130% so that the shadow is not clipped
+                var filter = defs.append("filter")
+                        .attr("id", filterId)
+                        .attr("height", "130%");
+
+// SourceAlpha refers to opacity of graphic that this filter will be applied to
+// convolve that with a Gaussian with standard deviation 3 and store result
+// in blur
+                filter.append("feGaussianBlur")
+                        .attr("in", "SourceAlpha")
+                        .attr("stdDeviation", 3);
+//                        .attr("result", "blur");
+
+// translate output of Gaussian blur to the right and downwards with 2px
+// store result in offsetBlur
+                filter.append("feOffset")
+//                        .attr("in", "blur")
+                        .attr("dx", 2)
+                        .attr("dy", 2)
+                        .attr("result", "offsetBlur");
+
+// overlay original SourceGraphic over translated blurred opacity by using
+// feMerge filter. Order of specifying inputs is important!
+                var feMerge = filter.append("feMerge");
+
+                feMerge.append("feMergeNode");
+                feMerge.append("feMergeNode")
+                        .attr("in", "SourceGraphic");
+            }
+            createFilter();
+        };
+
+        initial();
+
+
+        var SceneNode=function(svg){
+            //attrs
+            var size=10;//圓圈尺寸
+            var gap=5;  //圓圈之間的距離
+            var x;
+            var y;
+            var textX;
+            var textY;
+            var fill;
+            var text;
+            var innerInfo;
+            var outerInfo;
+            var textInfo;
+            this.isRoot=false;
+            this.isEnd=false;
+            var isRoot=this.isRoot;
+            var isEnd=this.isEnd;
+            var id=this.id;
+
+            //Object Refs
+            var innerCircle;
+            var outerCircle;
+            var textZone;
+            this.lineToNext=null;
+            var me=this;
+            var lineToNext=me.lineToNext;
+
+            this.setLineToNext=function(line){
+                me.lineToNext=line;
+            };
+
+            //Ctrl Line Object
+            this.prev=null;
+            this.next=null;
+            var prev=me.prev;
+            var next=me.next;
+
+            this.getPrev=function(){
+                return this.prev;
+            };
+            this.setPrev=function(node){
+                this.prev=node;
+                if(node.getNext()==null)node.setNext(this);
+            };
+            this.getNext=function(){
+                return this.next;
+            };
+            this.setNext=function(node){
+                this.next=node;
+                if(node.getPrev()==null)node.setPrev(this);
+            };
+
+            this.moveAbs=function(coords){
+                me.x = coords.cx;
+                me.y = coords.cy;
+                innerCircle.attr(coords);
+                outerCircle.attr(coords);
+                textX = getTextX();
+                textY = getTextY();
+                textZone.attr({
+                    x:textX,y:textY
+                });
+                if(me.prev){
+                    me.prev.lineToNext.attr({
+                        points:getLinePoints(me.prev,me)
+                    });
+                }
+                if(me.next){
+                    me.lineToNext.attr({
+                        points:getLinePoints(me,me.next)
+                    });
+                }
+
+//                console.log('lineToNext',me.lineToNext);
+            };
+
+            function getTextX(){
+                return me.x+size+gap*2;
+            }
+
+            function getTextY(){
+                return me.y +size/2;
+            }
+
+            var initFun=function(){
+                text = me.text;
+                x = me.x || 0;
+                y = me.y || 0;
+                fill = me.fill || "";
+                textX = getTextX();
+                textY = getTextY();
+                innerInfo = {cx: x, cy: y,r:size
+                    ,id:me.id+"_inner"
+                    ,class:"nodeIn"
+//                    ,fill:"none"
+                    ,fill:"rgba(128, 0, 128, 1)"
+                    ,stroke:"rgba(128, 0, 128,1)",'stroke-width':strokeWidthThin
+                };
+                outerInfo = {cx: x, cy: y,r:size+gap
+                    ,id:me.id+"_outer"
+                    ,class:"nodeOut"
+                    ,fill:"white"
+//                    ,fill:"rgba(128, 0, 128, 0.50)"
+                    ,stroke:"rgba(128, 0, 128,1)",'stroke-width':strokeWidthThin
+                };
+                textInfo = {
+                    x: textX, y: textY,"font-family": "sans-serif","font-size":"20px"
+                    ,id:me.id+"_text"
+                };
+
+
+                innerCircle = svg.append("circle").attr(innerInfo);
+//                outerCircle = svg.append("circle").attr(outerInfo).style("filter", "url(#"+filterId+")");
+                outerCircle = svg.append("circle").attr(outerInfo);
+                textZone = svg.append("text").attr(textInfo).text(text);
+            };
+
+            initFun();
+
+            return this;
+        };
+
+        var getLinePoints=function(fromNode,toNode){
+            var coords=[];
+            coords.push(fromNode.x+","+fromNode.y);
+            coords.push(toNode.x+","+toNode.y);
+            return coords.join(" ");
+        };
+
+        /**結合同一個路徑的節點**/
+        var connectNode=function(root){
+            var next=root.next;
+            if(next){
+
+                var attrs={
+                    points:getLinePoints(root,next)
+                    ,stroke:"rgba(128, 0, 128,1)"
+                    ,"stroke-width":strokeWidth
+                };
+                var lineToNext=svg.append("polyline").attr(attrs);
+//                root.lineToNext=lineToNext;
+                root.setLineToNext(lineToNext)
+                connectNode(next);
+//                console.log("root.x",root.x+","+root.y);
+//                console.log("next.x",next.x+","+next.y);
+//                console.log("sceneMap",sceneMap);
+            }
+        };
+
+        /**把相同名稱的節點結合在一起**/
+        var mergeNodes=function(){
+            //mergeNodePosition
+            for(var key in sceneMap){
+                var scenes=sceneMap[key];
+                if(scenes.length>1){
+                    var sumX=0;
+                    var sumY=0;
+                    var newRy=0;
+                    var newRx=0;
+                    for (var i = 0; i < scenes.length; i++) {
+                        var node = scenes[i];
+                        newRy = node.y;
+                        sumX+=parseInt(node.x);
+                        sumY+=parseInt(node.y);
+                    }
+                    console.log('sumX',sumX+","+sumX/scenes.length);
+                    console.log('sumY',sumY+","+sumY/scenes.length);
+                    newRx = sumX/scenes.length;
+                    var newCoord={
+                        cx:newRx,cy:newRy
+                    };
+
+                    for (var i = 0; i < scenes.length; i++) {
+                        var node = scenes[i];
+                        node.moveAbs(newCoord);
+                    }
+                }
+            }
+        };
+
+        var routeList=[];//紀錄執行過幾個路徑
+        var sceneMap={};//保留相同名稱的節點，用以判斷是否需要合併
+
+        this.createRoute = function(sceneAry){
+            var sceneNodes=[];
+            var tmpNode;
+            var rootNode;
+            for (var i = 0; i < sceneAry.length; i++) {
+                var id =routeList.length+"_"+i;
+                var obj = sceneAry[i];
+                var y = baseY + step * i;
+                var x = baseX + 150 * routeList.length;
+                var node=SceneNode.apply({id:id,x:x,y:y,text:obj},[svg]);
+                if(tmpNode){
+                    node.setPrev(tmpNode);
+                }else{
+                    rootNode = node;
+                    node.isRoot=true;
+                }
+                sceneNodes.push(node);
+                tmpNode=node;
+                var sceneList=sceneMap[obj]||[];
+                sceneList.push(node);
+                if(!sceneMap[obj])sceneMap[obj]=sceneList;
+            }
+            tmpNode.isEnd=true;
+
+            connectNode(rootNode);
+            mergeNodes();
+
+            routeList.push(sceneNodes);
+            return sceneNodes;
+        };
+
+
+    }
+    var kkNode;
+    $(document).ready(function(){
+        var sceneAry=["Taipei","Hsinchu","Kaohsiung"];
+        var sceneAry2=["Sydney","Taipei","Australlia","Hsinchu","Tokyo"];
+        var sceneAry3=["Canada","Hsinchu","Japan"];
+        //createRoute(sceneAry,svg);
+        var sightScene=new SightScene({
+            targetZone:"#targetZone",
+            width:500,
+            height:1200
+        });
+
+        var route=sightScene.createRoute(sceneAry);
+        var route2=sightScene.createRoute(sceneAry2);
+//        var route3=sightScene.createRoute(sceneAry3);
+        console.log('route',route);
+
+    });
+</script>
