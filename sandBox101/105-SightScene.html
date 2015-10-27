@@ -23,6 +23,16 @@ Project Name : WebSandBox
 <style>
     .nodeIn{
         border: solid thin black;
+        cursor: pointer;
+    }
+    .unselectable {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        cursor: default;
     }
 </style>
 <div id="targetZone">
@@ -32,8 +42,6 @@ Project Name : WebSandBox
 </body>
 </html>
 <script>
-
-
     function SightScene(setting){
         if(setting){
             this.targetZone=setting.targetZone;
@@ -50,7 +58,6 @@ Project Name : WebSandBox
         var strokeWidth,strokeWidthThin;
         var filterId="drop-shadow";
         var initial=function(){
-
             targetZone = me.targetZone;
             width = me.width||500;
             height = me.height||500;
@@ -61,17 +68,14 @@ Project Name : WebSandBox
             baseY = me.baseY||50;
             svg = d3.select(targetZone)
                     .append("svg").attr("width", width).attr("height", height);
-
             var createFilter=function(){
                 // filters go in defs element
                 var defs = svg.append("defs");
-
 // create filter with id #drop-shadow
 // height=130% so that the shadow is not clipped
                 var filter = defs.append("filter")
                         .attr("id", filterId)
                         .attr("height", "130%");
-
 // SourceAlpha refers to opacity of graphic that this filter will be applied to
 // convolve that with a Gaussian with standard deviation 3 and store result
 // in blur
@@ -79,7 +83,6 @@ Project Name : WebSandBox
                         .attr("in", "SourceAlpha")
                         .attr("stdDeviation", 3);
 //                        .attr("result", "blur");
-
 // translate output of Gaussian blur to the right and downwards with 2px
 // store result in offsetBlur
                 filter.append("feOffset")
@@ -87,21 +90,16 @@ Project Name : WebSandBox
                         .attr("dx", 2)
                         .attr("dy", 2)
                         .attr("result", "offsetBlur");
-
 // overlay original SourceGraphic over translated blurred opacity by using
 // feMerge filter. Order of specifying inputs is important!
                 var feMerge = filter.append("feMerge");
-
                 feMerge.append("feMergeNode");
                 feMerge.append("feMergeNode")
                         .attr("in", "SourceGraphic");
             }
             createFilter();
         };
-
         initial();
-
-
         var SceneNode=function(svg){
             //attrs
             var size=10;//圓圈尺寸
@@ -125,35 +123,26 @@ Project Name : WebSandBox
             var innerCircle;
             var outerCircle;
             var textZone;
-            this.lineToNext=null;
+            this.lineToNext=[];
             var me=this;
-            var lineToNext=me.lineToNext;
-
             this.setLineToNext=function(line){
-                me.lineToNext=line;
+                me.lineToNext.push(line);
             };
-
             //Ctrl Line Object
-            this.prev=null;
-            this.next=null;
-            var prev=me.prev;
-            var next=me.next;
-
+            this.prev=[];
+            this.next=[];
             this.getPrev=function(){
                 return this.prev;
             };
             this.setPrev=function(node){
-                this.prev=node;
-                if(node.getNext()==null)node.setNext(this);
+                this.prev.push(node);
             };
             this.getNext=function(){
                 return this.next;
             };
             this.setNext=function(node){
-                this.next=node;
-                if(node.getPrev()==null)node.setPrev(this);
+                this.next.push(node);
             };
-
             this.moveAbs=function(coords){
                 me.x = coords.cx;
                 me.y = coords.cy;
@@ -164,28 +153,36 @@ Project Name : WebSandBox
                 textZone.attr({
                     x:textX,y:textY
                 });
-                if(me.prev){
-                    me.prev.lineToNext.attr({
-                        points:getLinePoints(me.prev,me)
+                var lines=me.lineToNext;
+                for (var i = 0; i < lines.length; i++) {
+                    var line = lines[i];
+                    line.attr({
+                        points:getLinePoints(me,line.endNode)
                     });
                 }
-                if(me.next){
-                    me.lineToNext.attr({
-                        points:getLinePoints(me,me.next)
-                    });
+                if(me.prev.length>0){
+                    var prevNodes=me.prev;
+                    for (var i = 0; i < prevNodes.length; i++) {
+                        var prevNode = prevNodes[i];
+                        var pNodeLines = prevNode.lineToNext;
+                        if(pNodeLines.length==0) continue;
+                        for (var j = 0; j < pNodeLines.length; j++) {
+                            var line = pNodeLines[j];
+                            if(line.endNode.id===me.id)
+                            line.attr({
+                                points:getLinePoints(line.startNode,me)
+                            });
+                        }
+                    }
                 }
             };
-
             function getTextX(){
                 return me.x+size+gap*2;
             }
-
             function getTextY(){
                 return me.y +size/2;
             }
-
             var initFun=function(){
-
                 text = me.text;
                 x = me.x || 0;
                 y = me.y || 0;
@@ -208,65 +205,60 @@ Project Name : WebSandBox
                 };
                 textInfo = {
                     x: textX, y: textY,"font-family": "sans-serif","font-size":"20px"
+                    ,class:"unselectable"
                     ,id:me.id+"_text"
                 };
-
                 var drag = d3.behavior.drag();
-//            selection.call(drag);
-
                 innerCircle = svg.append("circle").attr(innerInfo);
 //                outerCircle = svg.append("circle").attr(outerInfo).style("filter", "url(#"+filterId+")");
                 outerCircle = svg.append("circle").attr(outerInfo).call(drag);
                 textZone = svg.append("text").attr(textInfo).text(text);
-
                 me.objectRef=[innerCircle,outerCircle,textZone];
-
                 drag.on("dragstart", function() {
 //                    console.log('xy',d3.event.sourceEvent.pageX+","+d3.event.sourceEvent.pageY);
 //                    console.log('me',me.x+','+me.y);
                 });
                 drag.on("drag", function() {
                     d3.event.sourceEvent.stopPropagation(); // silence other listeners
-//                    var x=((d3.event.sourceEvent.pageX) - this.offsetWidth/2);
-//                    var y=((d3.event.sourceEvent.pageY) - this.offsetHeight/2);
                     me.moveAbs({
                         cx: d3.event.sourceEvent.pageX,cy:d3.event.sourceEvent.pageY
                     });
                 });
             };
-
             initFun();
-
             return this;
         };
-
         var getLinePoints=function(fromNode,toNode){
             var coords=[];
             coords.push(fromNode.x+","+fromNode.y);
             coords.push(toNode.x+","+toNode.y);
             return coords.join(" ");
         };
-
         /**結合同一個路徑的節點**/
         var connectNode=function(root){
-            var next=root.next;
-            if(next){
-
-                var attrs={
-                    points:getLinePoints(root,next)
-                    ,stroke:"rgba(128, 0, 128,1)"
-                    ,"stroke-width":strokeWidth
-                };
-                var lineToNext=svg.append("polyline").attr(attrs);
+            var nextNodes=root.next;
+            if(nextNodes&&nextNodes.length>0){
+                for (var i = 0; i < nextNodes.length; i++) {
+                    var nextNode = nextNodes[i];
+//                    console.log('nextNode.id',nextNode.id);
+                    var attrs={
+                        points:getLinePoints(root,nextNode)
+                        ,stroke:"rgba(128, 0, 128,1)"
+                        ,"stroke-width":strokeWidth
+                    };
+                    var lineToNext=svg.append("polyline").attr(attrs);
+                    lineToNext.startNode=root;
+                    lineToNext.endNode=nextNode;
 //                root.lineToNext=lineToNext;
-                root.setLineToNext(lineToNext)
-                connectNode(next);
+                    root.setLineToNext(lineToNext)
+                    connectNode(nextNode);
+                }
+
 //                console.log("root.x",root.x+","+root.y);
-//                console.log("next.x",next.x+","+next.y);
+//                console.log("nextNodes.x",nextNodes.x+","+nextNodes.y);
 //                console.log("sceneMap",sceneMap);
             }
         };
-
         /**把相同名稱的節點結合在一起**/
         var mergeNodes=function(){
             //mergeNodePosition
@@ -289,7 +281,6 @@ Project Name : WebSandBox
                     var newCoord={
                         cx:newRx,cy:newRy
                     };
-
                     for (var i = 0; i < scenes.length; i++) {
                         var node = scenes[i];
                         node.moveAbs(newCoord);
@@ -297,10 +288,8 @@ Project Name : WebSandBox
                 }
             }
         };
-
         var routeList=[];//紀錄執行過幾個路徑
         var sceneMap={};//保留相同名稱的節點，用以判斷是否需要合併
-
         this.createRoute = function(sceneAry){
             var sceneNodes=[];
             var tmpNode;
@@ -310,34 +299,35 @@ Project Name : WebSandBox
                 var obj = sceneAry[i];
                 var y = baseY + step * i;
                 var x = baseX + 150 * routeList.length;
-                var node=SceneNode.apply({id:id,x:x,y:y,text:obj},[svg]);
+                var node=sceneMap[obj];
+                if(!node){
+                    node = SceneNode.apply({id: id, x: x, y: y, text: obj}, [svg]);
+                    sceneMap[obj] = node;
+                }
                 if(tmpNode){
                     node.setPrev(tmpNode);
+                    tmpNode.setNext(node);
                 }else{
                     rootNode = node;
                     node.isRoot=true;
                 }
                 sceneNodes.push(node);
                 tmpNode=node;
-                var sceneList=sceneMap[obj]||[];
-                sceneList.push(node);
-                if(!sceneMap[obj])sceneMap[obj]=sceneList;
+//                var sceneList=sceneMap[obj]||[];
+//                sceneList.push(node);
+//                if(!sceneMap[obj])sceneMap[obj]=sceneList;
             }
             tmpNode.isEnd=true;
-
             connectNode(rootNode);
-            mergeNodes();
-
+//            mergeNodes();
             routeList.push(sceneNodes);
             return sceneNodes;
         };
-
-
     }
     var kkNode;
     $(document).ready(function(){
         var sceneAry=["Taipei","Hsinchu","Kaohsiung"];
-        var sceneAry2=["Sydney","Taipei","Australlia","Hsinchu","Tokyo"];
+        var sceneAry2=["Sydney","Australlia","Hsinchu","Tokyo"];
         var sceneAry3=["Canada","Hsinchu","Japan"];
         //createRoute(sceneAry,svg);
         var sightScene=new SightScene({
@@ -345,11 +335,9 @@ Project Name : WebSandBox
             width:500,
             height:1200
         });
-
         var route=sightScene.createRoute(sceneAry);
         var route2=sightScene.createRoute(sceneAry2);
-//        var route3=sightScene.createRoute(sceneAry3);
+        var route3=sightScene.createRoute(sceneAry3);
         console.log('route',route);
-
     });
 </script>
