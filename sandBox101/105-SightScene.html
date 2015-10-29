@@ -110,6 +110,27 @@ Project Name : WebSandBox
 <script>
 
     function bindEditorEvent(){
+
+        function createTextNode(){
+            var defaultGroupClass="col-md-2";
+            var $group=$("<div>").addClass(defaultGroupClass);
+            var $inputGroup=$('<div class="input-group input-group-sm">');
+            var $inputGroupBtnPrev=$('<div class="input-group-btn prev">');
+            var $inputGroupInput=$('<input type="text" class="form-control" aria-label="Text input with multiple buttons">');
+            var $inputGroupBtnNext=$('<div class="input-group-btn next">');
+            $inputGroup.append($inputGroupBtnPrev);
+            $inputGroup.append($inputGroupInput);
+            $inputGroup.append($inputGroupBtnNext);
+            $group.append($inputGroup);
+            console.log($group);
+        };
+
+        $('button[aria-label="Plus"]').on('click',function(){
+            var inputGroupCls = ".input-group";
+            var isPrev=$(this).closest(".input-group-btn").hasClass("prev");
+            createTextNode();
+        });
+
         $('button[aria-label="Transfer"]').on('click',function(){
             var inputGroupCls=".input-group";
             var isPrev=$(this).closest(".input-group-btn").hasClass("prev");
@@ -123,9 +144,10 @@ Project Name : WebSandBox
                 $targetGroup = $currentGroup.next();
                 if($targetGroup&&$targetGroup.length===1)$targetGroup.insertBefore($currentGroup);
             }
-
         });
+
         $('[data-toggle="tooltip"]').tooltip();
+
         $(".editor").each(function(){
             var initContent;
             var currentContent;
