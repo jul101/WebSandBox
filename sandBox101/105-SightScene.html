@@ -69,33 +69,33 @@ Project Name : WebSandBox
 <div class="container inputArea">
     <div class="row routeMasters">
         <button class="btn btn-primary"  type="button">
-            <div class="editor" contentEditable=true>Messages</div> <span class="badge">4</span>
+            <div class="editor" contentEditable=true>花蓮好吃路線</div> <span class="badge">4</span>
         </button>
     </div>
     <div class="row routeDetail">
         <div class="col-md-2">
             <div class="input-group input-group-sm">
-                <div class="input-group-btn">
-                    <button type="button" class="btn btn-default shrinkPadding" aria-label="Transfer"><span class="glyphicon glyphicon-transfer"></span></button>
-                    <button type="button" class="btn btn-default shrinkPadding" aria-label="Plus"><span class="glyphicon glyphicon-plus"></span></button>
+                <div class="input-group-btn prev">
+                    <button type="button" class="btn btn-default shrinkPadding" aria-label="Transfer" data-toggle="tooltip" data-placement="top" title="Switch"><span class="glyphicon glyphicon-transfer"></span></button>
+                    <button type="button" class="btn btn-default shrinkPadding" aria-label="Plus" data-toggle="tooltip" data-placement="top" title="Plus"><span class="glyphicon glyphicon-plus"></span></button>
                 </div>
                 <input type="text" class="form-control" aria-label="Text input with multiple buttons">
-                <div class="input-group-btn">
-                    <button type="button" class="btn btn-default shrinkPadding" aria-label="Plus"><span class="glyphicon glyphicon-plus"></span></button>
-                    <button type="button" class="btn btn-default shrinkPadding" aria-label="Transfer"><span class="glyphicon glyphicon-transfer"></span></button>
+                <div class="input-group-btn next">
+                    <button type="button" class="btn btn-default shrinkPadding" aria-label="Plus" data-toggle="tooltip" data-placement="top" title="Plus"><span class="glyphicon glyphicon-plus"></span></button>
+                    <button type="button" class="btn btn-default shrinkPadding" aria-label="Transfer" data-toggle="tooltip" data-placement="top" title="Switch"><span class="glyphicon glyphicon-transfer"></span></button>
                 </div>
             </div><!-- /.input-group -->
         </div><!-- /.col-lg-6 -->
         <div class="col-md-2">
             <div class="input-group input-group-sm">
-                <div class="input-group-btn">
-                    <button type="button" class="btn btn-default shrinkPadding" aria-label="Transfer"><span class="glyphicon glyphicon-transfer"></span></button>
-                    <button type="button" class="btn btn-default shrinkPadding" aria-label="Plus"><span class="glyphicon glyphicon-plus"></span></button>
+                <div class="input-group-btn prev">
+                    <button type="button" class="btn btn-default shrinkPadding" aria-label="Transfer" data-toggle="tooltip" data-placement="top" title="Switch"><span class="glyphicon glyphicon-transfer"></span></button>
+                    <button type="button" class="btn btn-default shrinkPadding" aria-label="Plus" data-toggle="tooltip" data-placement="top" title="Plus"><span class="glyphicon glyphicon-plus"></span></button>
                 </div>
                 <input type="text" class="form-control" aria-label="Text input with multiple buttons">
-                <div class="input-group-btn">
-                    <button type="button" class="btn btn-default shrinkPadding" aria-label="Plus"><span class="glyphicon glyphicon-plus"></span></button>
-                    <button type="button" class="btn btn-default shrinkPadding" aria-label="Transfer"><span class="glyphicon glyphicon-transfer"></span></button>
+                <div class="input-group-btn next">
+                    <button type="button" class="btn btn-default shrinkPadding" aria-label="Plus" data-toggle="tooltip" data-placement="top" title="Plus"><span class="glyphicon glyphicon-plus"></span></button>
+                    <button type="button" class="btn btn-default shrinkPadding" aria-label="Transfer" data-toggle="tooltip" data-placement="top" title="Switch"><span class="glyphicon glyphicon-transfer"></span></button>
                 </div>
             </div><!-- /.input-group -->
         </div><!-- /.col-lg-6 -->
@@ -110,6 +110,22 @@ Project Name : WebSandBox
 <script>
 
     function bindEditorEvent(){
+        $('button[aria-label="Transfer"]').on('click',function(){
+            var inputGroupCls=".input-group";
+            var isPrev=$(this).closest(".input-group-btn").hasClass("prev");
+//            console.log('isPrev',isPrev);
+            var $currentGroup=$(this).closest(inputGroupCls).parent();
+            var $targetGroup;
+            if(isPrev){
+                $targetGroup = $currentGroup.prev();
+                if($targetGroup&&$targetGroup.length===1)$currentGroup.insertBefore($targetGroup);
+            }else{
+                $targetGroup = $currentGroup.next();
+                if($targetGroup&&$targetGroup.length===1)$targetGroup.insertBefore($currentGroup);
+            }
+
+        });
+        $('[data-toggle="tooltip"]').tooltip();
         $(".editor").each(function(){
             var initContent;
             var currentContent;
