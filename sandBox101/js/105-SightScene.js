@@ -7,8 +7,10 @@ function SightScene(setting){
         this.width=setting.width;
         this.height=setting.height;
         this.step=setting.step;
+        this.viewBox=setting.viewBox;
     }
     var targetZone;
+    var targetZoneOffset;
     var width,height;
     var svg;
     var me=this;
@@ -18,6 +20,7 @@ function SightScene(setting){
     var filterId="drop-shadow";
     var initial=function(){
         targetZone = me.targetZone;
+        targetZoneOffset = $(targetZone).offset();
         width = me.width||500;
         height = me.height||500;
         step = me.step||100;
@@ -26,7 +29,8 @@ function SightScene(setting){
         baseX = me.baseX||50;
         baseY = me.baseY||50;
         svg = d3.select(targetZone)
-            .append("svg").attr("width", width).attr("height", height);
+            //.append("svg").attr("width", width).attr("height", height);
+            .append("svg").attr(me);
         var createFilter=function(){
             // filters go in defs element
             var defs = svg.append("defs");
@@ -101,6 +105,8 @@ function SightScene(setting){
         this.colorValSub=this.colorValSub||"rgba(128, 0, 128,0.5)";
         this.isInit=false;
         var isNeedOutCircle=false;
+        this.baseX=this.baseX||0;
+        this.baseY=this.baseY||0;
 
         //Object Refs
         var d3Objs=[];
@@ -233,13 +239,21 @@ function SightScene(setting){
             outerCircle = svg.append("circle").attr(outerInfo).call(drag);
             textZone = svg.append("text").attr(textInfo).text(text);
             drag.on("dragstart", function() {
-//                    console.log('xy',d3.event.sourceEvent.pageX+","+d3.event.sourceEvent.pageY);
-//                    console.log('me',me.x+','+me.y);
+                    //console.log('xy',me.x+","+me.y);
+                    //console.log('xy',d3.event.sourceEvent.pageX+","+d3.event.sourceEvent.pageY);
+                    //console.log('xy',d3.event.sourceEvent.clientX-me.baseX+","+d3.event.sourceEvent.clientY);
+                    //console.log('me',me.x+','+me.y);
             });
             drag.on("drag", function() {
                 d3.event.sourceEvent.stopPropagation(); // silence other listeners
+                var eventX = d3.event.sourceEvent.clientX;
+                var eventY = d3.event.sourceEvent.clientY;
+                var offsetLeft=(me.baseX+this.parentNode.offsetLeft);
+                var offsetTop=(me.baseY+this.parentNode.offsetTop);
                 me.moveAbs({
-                    cx: d3.event.sourceEvent.pageX,cy:d3.event.sourceEvent.pageY
+                    //cx: d3.event.sourceEvent.pageX,cy:d3.event.sourceEvent.pageY
+                    //cx: d3.event.sourceEvent.clientX,cy:d3.event.sourceEvent.clientY
+                    cx: eventX-offsetLeft,cy:eventY-offsetTop
                 });
             });
             d3Objs.push(innerCircle);
@@ -324,6 +338,8 @@ function SightScene(setting){
             var node=sceneMap[sceneKey];
             var nodeInfo={
                 id: id, x: x, y: y, text: sceneKey
+                ,baseX:targetZoneOffset.left
+                ,baseY:targetZoneOffset.top
                 ,colorValMain:colorValMain
                 ,colorValSub:colorValSub
             };
