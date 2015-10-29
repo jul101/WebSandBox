@@ -35,11 +35,99 @@ Project Name : WebSandBox
         user-select: none;
         cursor: default;
     }
+    .editor{
+        display: inline-block;
+    }
+    .routeMasters{
+        padding: 1em;
+        /*height: 10%;*/
+        /*background-color: red;*/
+    }
+    .routeDetail{
+        padding: 1em 0;
+        /*height: 10%;*/
+        /*margin: auto -30px;*/
+        /*background-color: green;*/
+    }
+    .inputArea{
+        height: 20%;
+    }
+    #targetZone{
+        height: 80%;
+        /*background-color: gainsboro;*/
+        overflow: scroll;
+    }
+    div.routeDetail div.input-group-btn button.shrinkPadding{
+        padding: 0 5px;
+    }
+    body, html {
+        height: 100%;
+        overflow: hidden;
+    }
+
 </style>
-<div id="targetZone"></div>
+<div class="container inputArea">
+    <div class="row routeMasters">
+        <button class="btn btn-primary"  type="button">
+            <div class="editor" contentEditable=true>Messages</div> <span class="badge">4</span>
+        </button>
+    </div>
+    <div class="row routeDetail">
+        <div class="col-md-2">
+            <div class="input-group input-group-sm">
+                <div class="input-group-btn">
+                    <button type="button" class="btn btn-default shrinkPadding" aria-label="Transfer"><span class="glyphicon glyphicon-transfer"></span></button>
+                    <button type="button" class="btn btn-default shrinkPadding" aria-label="Plus"><span class="glyphicon glyphicon-plus"></span></button>
+                </div>
+                <input type="text" class="form-control" aria-label="Text input with multiple buttons">
+                <div class="input-group-btn">
+                    <button type="button" class="btn btn-default shrinkPadding" aria-label="Plus"><span class="glyphicon glyphicon-plus"></span></button>
+                    <button type="button" class="btn btn-default shrinkPadding" aria-label="Transfer"><span class="glyphicon glyphicon-transfer"></span></button>
+                </div>
+            </div><!-- /.input-group -->
+        </div><!-- /.col-lg-6 -->
+        <div class="col-md-2">
+            <div class="input-group input-group-sm">
+                <div class="input-group-btn">
+                    <button type="button" class="btn btn-default shrinkPadding" aria-label="Transfer"><span class="glyphicon glyphicon-transfer"></span></button>
+                    <button type="button" class="btn btn-default shrinkPadding" aria-label="Plus"><span class="glyphicon glyphicon-plus"></span></button>
+                </div>
+                <input type="text" class="form-control" aria-label="Text input with multiple buttons">
+                <div class="input-group-btn">
+                    <button type="button" class="btn btn-default shrinkPadding" aria-label="Plus"><span class="glyphicon glyphicon-plus"></span></button>
+                    <button type="button" class="btn btn-default shrinkPadding" aria-label="Transfer"><span class="glyphicon glyphicon-transfer"></span></button>
+                </div>
+            </div><!-- /.input-group -->
+        </div><!-- /.col-lg-6 -->
+    </div><!-- /.row -->
+</div>
+<div id="targetZone" class="col-lg-12"></div>
+
+
+
 </body>
 </html>
 <script>
+
+    function bindEditorEvent(){
+        $(".editor").each(function(){
+            var initContent;
+            var currentContent;
+            this.addEventListener('focus',function(){
+                initContent = $(this).text();
+            });
+            this.addEventListener('blur',function(){
+                currentContent = $(this).text();
+                if(!currentContent){
+                    currentContent = initContent;
+                    $(this).text(initContent);
+                }else{
+                    currentContent = currentContent.trim();
+                }
+                $(this).text(currentContent);
+            });
+        });
+    }
 
     var kkNode;
     $(document).ready(function(){
@@ -49,12 +137,15 @@ Project Name : WebSandBox
         //createRoute(sceneAry,svg);
         var sightScene=new SightScene({
             targetZone:"#targetZone",
-            width:'100%',
-            height:1200
+//            viewBox:"0 0 2000 500",
+            width:'150%',
+            height:'150%'
         });
         var route=sightScene.createRoute(sceneAry);
         var route2=sightScene.createRoute(sceneAry2);
         var route3=sightScene.createRoute(sceneAry3);
         console.log('route',route);
+        bindEditorEvent();
+
     });
 </script>
