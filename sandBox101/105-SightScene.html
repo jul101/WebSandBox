@@ -68,6 +68,10 @@ Project Name : WebSandBox
 </style>
 <div class="container inputArea">
     <div class="row routeMasters">
+        <button type="button" class="btn btn-default shrinkPadding" aria-label="Save" data-toggle="tooltip" data-placement="left" title="Save"><span class="glyphicon glyphicon-save-file"></span></button>
+        <canvas style="display: none;"></canvas>
+    </div>
+    <div class="row routeMasters">
         <button class="btn btn-primary"  type="button">
             <div class="editor" contentEditable=true>花蓮好吃路線</div> <span class="badge">4</span>
         </button>
@@ -125,6 +129,32 @@ Project Name : WebSandBox
             console.log($group);
         };
 
+        $('button[aria-label="Save"]').on('click',function(){
+            var html = d3.select("svg")
+                    .attr("width", $("svg").width())
+                    .attr("height", $("svg").height())
+                    .attr("version", 1.1)
+                    .attr("xmlns", "http://www.w3.org/2000/svg")
+                    .node().parentNode.innerHTML;
+
+//            console.log(html);
+            var imgsrc = 'data:image/svg+xml;base64,'+ btoa(html);
+            var image = new Image;
+            image.src = imgsrc;
+            image.onload = function() {
+
+                var canvas = document.querySelector("canvas");
+                canvas.width = image.width;
+                canvas.height = image.height;
+
+                var context = canvas.getContext("2d");
+                context.drawImage(image, 0, 0);
+                var a = document.createElement("a");
+                a.download = "sample.png";
+                a.href = canvas.toDataURL("image/png");
+                a.click();
+            };
+        });
         $('button[aria-label="Plus"]').on('click',function(){
             var inputGroupCls = ".input-group";
             var isPrev=$(this).closest(".input-group-btn").hasClass("prev");
