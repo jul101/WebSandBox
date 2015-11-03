@@ -13,7 +13,7 @@ Project Name : WebSandBox
     <link rel="stylesheet" href="../bootstrap/bootstrap-3.3.5-dist/css/bootstrap.css">
 
     <!-- Optional theme -->
-    <link rel="stylesheet" href="../bootstrap/bootstrap-3.3.5-dist/css/bootstrap-theme.min.css">
+    <!--<link rel="stylesheet" href="../bootstrap/bootstrap-3.3.5-dist/css/bootstrap-theme.min.css">-->
 
     <!-- Latest compiled and minified JavaScript -->
     <script src="../bootstrap/bootstrap-3.3.5-dist/js/bootstrap.js"></script>
@@ -49,6 +49,11 @@ Project Name : WebSandBox
         /*margin: auto -30px;*/
         /*background-color: green;*/
     }
+    .deleteRoute{
+        color: red;
+        background: white;
+        border-radius: 1.2em;
+    }
     .inputArea{
         height: 20%;
     }
@@ -57,8 +62,17 @@ Project Name : WebSandBox
         /*background-color: gainsboro;*/
         overflow: scroll;
     }
-    div.routeDetail div.input-group-btn button.shrinkPadding{
-        padding: 0 5px;
+    #routeMasters .btn-group{
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+    #routeDetail .form-control{
+        padding: 5px;
+    }
+    #routeMasters .shrinkPadding,
+    #routeDetail .shrinkPadding{
+        padding-left: 5px;
+        padding-right: 5px;
     }
     body, html {
         height: 100%;
@@ -68,38 +82,64 @@ Project Name : WebSandBox
 </style>
 <div class="container inputArea">
     <div class="row routeMasters">
-        <button type="button" class="btn btn-default shrinkPadding" aria-label="Save" data-toggle="tooltip" data-placement="left" title="Save"><span class="glyphicon glyphicon-save-file"></span></button>
+        <button type="button" class="btn btn-primary shrinkPadding" aria-label="Save" data-toggle="tooltip" data-placement="left" title="Save">Export PNG <span class="glyphicon glyphicon-save-file"></span></button>
         <canvas style="display: none;"></canvas>
     </div>
-    <div class="row routeMasters">
-        <button class="btn btn-primary"  type="button">
-            <div class="editor" contentEditable=true>花蓮好吃路線</div> <span class="badge">4</span>
+    <div id="routeMasters" class="row routeMasters">
+        <button class="btn btn-success shrinkPadding" aria-label="AddRoute" data-toggle="tooltip" data-placement="top" title="Add Route" type="button">
+            <span class="glyphicon glyphicon-plus"></span>
         </button>
+        <div class="btn-group">
+            <button type="button" class="btn btn-danger shrinkPadding" aria-label="DeleteRoute" data-toggle="tooltip" data-placement="top" title="Delete"><span class="glyphicon glyphicon-minus"></span></button>
+            <button class="btn btn-primary" type="button">
+                <div class="editor" contentEditable=true>Default Route</div>
+                <span class="badge">2</span>
+            </button>
+        </div>
     </div>
-    <div class="row routeDetail">
+    <div id="routeDetail" class="row routeDetail">
+        <!--<div class="btn-group">-->
+            <!--<button type="button" class="btn btn-primary shrinkPadding" aria-label="Transfer" data-toggle="tooltip" data-placement="top" title="Switch"><span class="glyphicon glyphicon-transfer"></span></button>-->
+            <!--<button type="button" class="btn btn-danger shrinkPadding" aria-label="Delete" data-toggle="tooltip" data-placement="top" title="Delete"><span class="glyphicon glyphicon-minus"></span></button>-->
+            <!--<button class="btn btn-default" type="button">-->
+                <!--<div class="editor" contentEditable=true>Start Point</div>-->
+            <!--</button>-->
+            <!--<button type="button" class="btn btn-primary shrinkPadding" aria-label="Plus" data-toggle="tooltip" data-placement="top" title="Plus"><span class="glyphicon glyphicon-plus"></span></button>-->
+            <!--<button type="button" class="btn btn-primary shrinkPadding" aria-label="Transfer" data-toggle="tooltip" data-placement="top" title="Switch"><span class="glyphicon glyphicon-transfer"></span></button>-->
+        <!--</div>-->
+        <!--<div class="btn-group">-->
+            <!--<button type="button" class="btn btn-primary shrinkPadding" aria-label="Transfer" data-toggle="tooltip" data-placement="top" title="Switch"><span class="glyphicon glyphicon-transfer"></span></button>-->
+            <!--<button type="button" class="btn btn-danger shrinkPadding" aria-label="Delete" data-toggle="tooltip" data-placement="top" title="Delete"><span class="glyphicon glyphicon-minus"></span></button>-->
+            <!--<button class="btn btn-default" type="button">-->
+                <!--<div class="editor" contentEditable=true>2nd stop</div>-->
+            <!--</button>-->
+            <!--<button type="button" class="btn btn-primary shrinkPadding" aria-label="Plus" data-toggle="tooltip" data-placement="top" title="Plus"><span class="glyphicon glyphicon-plus"></span></button>-->
+            <!--<button type="button" class="btn btn-primary shrinkPadding" aria-label="Transfer" data-toggle="tooltip" data-placement="top" title="Switch"><span class="glyphicon glyphicon-transfer"></span></button>-->
+        <!--</div>-->
+
+        <div class="col-md-2">
+        <div class="input-group input-group-sm">
+            <div class="input-group-btn prev">
+                <button type="button" class="btn btn-primary shrinkPadding" aria-label="Transfer" data-toggle="tooltip" data-placement="top" title="Switch"><span class="glyphicon glyphicon-transfer"></span></button>
+                <button type="button" class="btn btn-danger shrinkPadding" aria-label="Delete" data-toggle="tooltip" data-placement="top" title="Delete"><span class="glyphicon glyphicon-minus"></span></button>
+            </div>
+            <input type="text" class="form-control" aria-label="Text input with multiple buttons" value="Start Point"/>
+            <div class="input-group-btn next">
+                <button type="button" class="btn btn-primary shrinkPadding" aria-label="Plus" data-toggle="tooltip" data-placement="top" title="Plus"><span class="glyphicon glyphicon-plus"></span></button>
+                <button type="button" class="btn btn-primary shrinkPadding" aria-label="Transfer" data-toggle="tooltip" data-placement="top" title="Switch"><span class="glyphicon glyphicon-transfer"></span></button>
+            </div>
+        </div><!-- /.input-group -->
+    </div><!-- /.col-lg-6 -->
         <div class="col-md-2">
             <div class="input-group input-group-sm">
                 <div class="input-group-btn prev">
-                    <button type="button" class="btn btn-default shrinkPadding" aria-label="Transfer" data-toggle="tooltip" data-placement="top" title="Switch"><span class="glyphicon glyphicon-transfer"></span></button>
-                    <button type="button" class="btn btn-default shrinkPadding" aria-label="Plus" data-toggle="tooltip" data-placement="top" title="Plus"><span class="glyphicon glyphicon-plus"></span></button>
+                    <button type="button" class="btn btn-primary shrinkPadding" aria-label="Transfer" data-toggle="tooltip" data-placement="top" title="Switch"><span class="glyphicon glyphicon-transfer"></span></button>
+                    <button type="button" class="btn btn-danger shrinkPadding" aria-label="Delete" data-toggle="tooltip" data-placement="top" title="Delete"><span class="glyphicon glyphicon-minus"></span></button>
                 </div>
-                <input type="text" class="form-control" aria-label="Text input with multiple buttons">
+                <input type="text" class="form-control" aria-label="Text input with multiple buttons" value="2nd Stop"/>
                 <div class="input-group-btn next">
-                    <button type="button" class="btn btn-default shrinkPadding" aria-label="Plus" data-toggle="tooltip" data-placement="top" title="Plus"><span class="glyphicon glyphicon-plus"></span></button>
-                    <button type="button" class="btn btn-default shrinkPadding" aria-label="Transfer" data-toggle="tooltip" data-placement="top" title="Switch"><span class="glyphicon glyphicon-transfer"></span></button>
-                </div>
-            </div><!-- /.input-group -->
-        </div><!-- /.col-lg-6 -->
-        <div class="col-md-2">
-            <div class="input-group input-group-sm">
-                <div class="input-group-btn prev">
-                    <button type="button" class="btn btn-default shrinkPadding" aria-label="Transfer" data-toggle="tooltip" data-placement="top" title="Switch"><span class="glyphicon glyphicon-transfer"></span></button>
-                    <button type="button" class="btn btn-default shrinkPadding" aria-label="Plus" data-toggle="tooltip" data-placement="top" title="Plus"><span class="glyphicon glyphicon-plus"></span></button>
-                </div>
-                <input type="text" class="form-control" aria-label="Text input with multiple buttons">
-                <div class="input-group-btn next">
-                    <button type="button" class="btn btn-default shrinkPadding" aria-label="Plus" data-toggle="tooltip" data-placement="top" title="Plus"><span class="glyphicon glyphicon-plus"></span></button>
-                    <button type="button" class="btn btn-default shrinkPadding" aria-label="Transfer" data-toggle="tooltip" data-placement="top" title="Switch"><span class="glyphicon glyphicon-transfer"></span></button>
+                    <button type="button" class="btn btn-primary shrinkPadding" aria-label="Plus" data-toggle="tooltip" data-placement="top" title="Plus"><span class="glyphicon glyphicon-plus"></span></button>
+                    <button type="button" class="btn btn-primary shrinkPadding" aria-label="Transfer" data-toggle="tooltip" data-placement="top" title="Switch"><span class="glyphicon glyphicon-transfer"></span></button>
                 </div>
             </div><!-- /.input-group -->
         </div><!-- /.col-lg-6 -->
@@ -108,60 +148,181 @@ Project Name : WebSandBox
 <div id="targetZone" class="col-lg-12"></div>
 
 
-
 </body>
 </html>
 <script>
 
-    function bindEditorEvent(){
+    function Route(sightScene){
+        var me=this;
+        var nodes = me.nodes;
+        var $routeBtn = me.$routeBtn;
+        var $badge = me.$badge;
+        var svgNodes = me.svgNodes;
+        var $routeDetail = me.$routeDetail;
+        var uiControl = me.uiControl;
 
-        function createTextNode(){
-            var defaultGroupClass="col-md-2";
-            var $group=$("<div>").addClass(defaultGroupClass);
+        function displayNodeText(){
+            $routeDetail.empty();
+            for (var i = 0; i < nodes.length; i++) {
+                var node = nodes[i];
+                uiControl.addNodeInput(node);
+            }
+//            console.log('displayNodeText',$routeDetail);
+//            console.log('uiControl',uiControl);
+        }
+
+        this.init=function(){
+            $routeBtn = me.$routeBtn;
+            $badge = me.$badge;
+            svgNodes = me.svgNodes;
+            $routeDetail = me.$routeDetail;
+            uiControl = me.uiControl;
+//            console.log(me);
+//            console.log(sightScene);
+            if($badge){
+                $badge.text(nodes.length);
+            }
+            $routeBtn.find(".editor").parent().on('click',displayNodeText);
+            return me;
+        };
+        return this;
+    }
+
+    function UIControl(sightScene){
+        var routeMasterId="routeMasters";
+        var $routeMasters=$("#"+routeMasterId);
+        var routeDetailId="routeDetail";
+        var $routeDetail=$("#"+routeDetailId);
+        var defaultRouteBtnClass="btn-group";
+        var defaultNodeGroupClass="col-md-2";
+        var me=this;
+
+        this.drawSvg=function(routes){
+            if(!routes||routes.length==0)return;
+            for (var i = 0; i < routes.length; i++) {
+                var routeInfo = routes[i];
+                var route = Route.apply(routeInfo);
+                var $routeBtn = me.addRoute(name);
+                var $badge = $routeBtn.find(".badge");
+                route.$routeBtn = $routeBtn;
+                route.$routeDetail=$routeDetail;
+                route.$badge = $badge;
+                route.svgNodes = sightScene.createRoute(route.nodes);
+                route.uiControl = me;
+                route.init();
+            }
+        };
+
+        this.addNodeInput=function(nodeText){
+            var newNode=createNodeInput(nodeText);
+            $routeDetail.append(newNode);
+        };
+
+        this.addRoute=function(routeName){
+            var $route=$("<div>").addClass(defaultRouteBtnClass);
+            $route.append(getDeleteBtn());
+            $route.append(getMainBtn());
+            $routeMasters.append($route);
+
+            return $route;
+
+            function getMainBtn(){
+                var $mainBtn=$('<button class="btn btn-primary" type="button">');
+                if(!routeName) routeName = 'Default Route';
+                $mainBtn.append('<div class="editor" contentEditable=true>'+routeName+'</div>\n');
+                $mainBtn.append('<span class="badge">0</span>');
+//                $mainBtn.on('click',delClickFun);
+//                $mainBtn.tooltip();
+                return $mainBtn;
+            }
+            function getDeleteBtn(){
+                var $delBtn=$('<button type="button" class="btn btn-danger shrinkPadding" aria-label="Delete" data-toggle="tooltip" data-placement="top" title="Delete"><span class="glyphicon glyphicon-minus"></span></button>');
+                $delBtn.on('click',delRouteClickFun);
+                $delBtn.tooltip();
+                return $delBtn;
+            }
+        };
+
+
+        function addRouteClickFun(){
+            me.addRoute();
+        }
+
+        function createNodeInput(nodeText){
+            var $group=$("<div>").addClass(defaultNodeGroupClass);
             var $inputGroup=$('<div class="input-group input-group-sm">');
             var $inputGroupBtnPrev=$('<div class="input-group-btn prev">');
             var $inputGroupInput=$('<input type="text" class="form-control" aria-label="Text input with multiple buttons">');
+            $inputGroupInput.val(nodeText);
             var $inputGroupBtnNext=$('<div class="input-group-btn next">');
+            $inputGroupBtnPrev.append(getTransferBtn());
+            $inputGroupBtnPrev.append(getDeleteBtn());
+            $inputGroupBtnNext.append(getPlusBtn());
+            $inputGroupBtnNext.append(getTransferBtn());
             $inputGroup.append($inputGroupBtnPrev);
             $inputGroup.append($inputGroupInput);
             $inputGroup.append($inputGroupBtnNext);
             $group.append($inputGroup);
             console.log($group);
-        };
 
-        $('button[aria-label="Save"]').on('click',function(){
-            var html = d3.select("svg")
-                    .attr("width", $("svg").width())
-                    .attr("height", $("svg").height())
-                    .attr("version", 1.1)
-                    .attr("xmlns", "http://www.w3.org/2000/svg")
-                    .node().parentNode.innerHTML;
+            function getDeleteBtn(){
+                var $delBtn=$('<button type="button" class="btn btn-danger shrinkPadding" aria-label="Delete" data-toggle="tooltip" data-placement="top" title="Delete"><span class="glyphicon glyphicon-minus"></span></button>');
+                $delBtn.on('click',delClickFun);
+                $delBtn.tooltip();
+                return $delBtn;
+            }
+            function getPlusBtn(){
+                var $plusBtn=$('<button type="button" class="btn btn-primary shrinkPadding" aria-label="Plus" data-toggle="tooltip" data-placement="top" title="Add Scene Node"><span class="glyphicon glyphicon-plus"></span></button>');
+                $plusBtn.on('click',plusClickFun);
+                $plusBtn.tooltip();
+                return $plusBtn;
+            }
+            function getTransferBtn(){
+                var $transferBtn= $('<button type="button" class="btn btn-primary shrinkPadding" aria-label="Transfer" data-toggle="tooltip" data-placement="top" title="Switch"><span class="glyphicon glyphicon-transfer"></span></button>');
+                $transferBtn.on('click',transferClickFun);
+                $transferBtn.tooltip();
+                return $transferBtn;
+            }
+            return $group;
+        }
 
-//            console.log(html);
-            var imgsrc = 'data:image/svg+xml;base64,'+ btoa(html);
-            var image = new Image;
-            image.src = imgsrc;
-            image.onload = function() {
+        function insertTextNode($nodeObj,$targetObj){
+            var inputGroupCls=".input-group";
+            var isPrev=$nodeObj.closest(".input-group-btn").hasClass("prev");
+            console.log('isPrev',isPrev);
+            var $currentGroup=$nodeObj.closest(inputGroupCls).parent();
+            if(isPrev){
+                if($targetObj&&$targetObj.length===1)$targetObj.insertBefore($currentGroup);
+            }else{
+                if($targetObj&&$targetObj.length===1)$targetObj.insertAfter($currentGroup);
+            }
+        }
 
-                var canvas = document.querySelector("canvas");
-                canvas.width = image.width;
-                canvas.height = image.height;
+        function hindToolTip(){
+            $(".tooltip").hide();
+        }
 
-                var context = canvas.getContext("2d");
-                context.drawImage(image, 0, 0);
-                var a = document.createElement("a");
-                a.download = "sample.png";
-                a.href = canvas.toDataURL("image/png");
-                a.click();
-            };
-        });
-        $('button[aria-label="Plus"]').on('click',function(){
-            var inputGroupCls = ".input-group";
-            var isPrev=$(this).closest(".input-group-btn").hasClass("prev");
-            createTextNode();
-        });
+        function delRouteClickFun(){
+            hindToolTip();
+            var inputGroupCls=".btn-group";
+            var $currentGroup=$(this).closest(inputGroupCls);
+            $currentGroup.remove();
+        }
+        function delClickFun(){
+            hindToolTip();
+            var inputGroupCls=".input-group";
+            var $currentGroup=$(this).closest(inputGroupCls).parent();
+            $currentGroup.remove();
+        }
 
-        $('button[aria-label="Transfer"]').on('click',function(){
+        function plusClickFun(){
+            hindToolTip();
+            var textNode=createNodeInput();
+            insertTextNode($(this),textNode);
+        }
+
+        function transferClickFun(){
+            hindToolTip();
             var inputGroupCls=".input-group";
             var isPrev=$(this).closest(".input-group-btn").hasClass("prev");
 //            console.log('isPrev',isPrev);
@@ -174,27 +335,68 @@ Project Name : WebSandBox
                 $targetGroup = $currentGroup.next();
                 if($targetGroup&&$targetGroup.length===1)$targetGroup.insertBefore($currentGroup);
             }
-        });
+        }
 
-        $('[data-toggle="tooltip"]').tooltip();
+        /**
+         * UI Event Binding
+         * **/
+        function eventBinder(){
+            $('button[aria-label="DeleteRoute"]').on('click',delRouteClickFun);
+            $('button[aria-label="AddRoute"]').on('click',addRouteClickFun);
+            $('button[aria-label="Delete"]').on('click',delClickFun);
+            $('button[aria-label="Plus"]').on('click',plusClickFun);
+            $('button[aria-label="Transfer"]').on('click',transferClickFun);
+            //        $('[data-toggle="tooltip"]').tooltip();
+            $(".editor").each(function(){
+                var initContent;
+                var currentContent;
+                this.addEventListener('focus',function(){
+                    initContent = $(this).text();
+                });
+                this.addEventListener('blur',function(){
+                    currentContent = $(this).text();
+                    if(!currentContent){
+                        currentContent = initContent;
+                        $(this).text(initContent);
+                    }else{
+                        currentContent = currentContent.trim();
+                    }
+                    $(this).text(currentContent);
+                });
+            });
+            $('button[aria-label="Save"]').on('click',function(){
+                var html = d3.select("svg")
+                        .attr("width", $("svg").width())
+                        .attr("height", $("svg").height())
+                        .attr("version", 1.1)
+                        .attr("xmlns", "http://www.w3.org/2000/svg")
+                        .node().parentNode.innerHTML;
 
-        $(".editor").each(function(){
-            var initContent;
-            var currentContent;
-            this.addEventListener('focus',function(){
-                initContent = $(this).text();
+//            console.log(html);
+                var imgsrc = 'data:image/svg+xml;base64,'+ btoa(html);
+                var image = new Image;
+                image.src = imgsrc;
+                image.onload = function() {
+
+                    var canvas = document.querySelector("canvas");
+                    canvas.width = image.width;
+                    canvas.height = image.height;
+
+                    var context = canvas.getContext("2d");
+                    context.drawImage(image, 0, 0);
+                    var a = document.createElement("a");
+                    a.download = "sample.png";
+                    a.href = canvas.toDataURL("image/png");
+                    a.click();
+                };
             });
-            this.addEventListener('blur',function(){
-                currentContent = $(this).text();
-                if(!currentContent){
-                    currentContent = initContent;
-                    $(this).text(initContent);
-                }else{
-                    currentContent = currentContent.trim();
-                }
-                $(this).text(currentContent);
-            });
-        });
+        }
+
+        this.initial=function(routes){
+            eventBinder();
+            this.routes=routes;
+            me.drawSvg(routes);
+        }
     }
 
     var kkNode;
@@ -209,11 +411,28 @@ Project Name : WebSandBox
             width:'150%',
             height:'150%'
         });
-        var route=sightScene.createRoute(sceneAry);
-        var route2=sightScene.createRoute(sceneAry2);
-        var route3=sightScene.createRoute(sceneAry3);
-        console.log('route',route);
-        bindEditorEvent();
+//        $("canvas").height($("svg").height());
+//        $("canvas").width($("svg").width());
+//        var route=sightScene.createRoute(sceneAry);
+//        var route2=sightScene.createRoute(sceneAry2);
+//        var route3=sightScene.createRoute(sceneAry3);
+//        console.log('route',route);
+        var routes=[];
+        routes.push({
+            name:"Default Route2",
+            nodes:sceneAry
+        });
+        routes.push({
+            name:"Default Route3",
+            nodes:sceneAry2
+        });
+        routes.push({
+            name:"Default Route4",
+            nodes:sceneAry3
+        });
+        var control=new UIControl(sightScene);
+        control.initial(routes);
+//        control.addNodeInput(999);
 
     });
 </script>
