@@ -152,37 +152,275 @@ Project Name : WebSandBox
 </html>
 <script>
 
-    function Route(sightScene){
+    function Node(){
         var me=this;
-        var nodes = me.nodes;
+        var defaultNodeGroupClass="col-md-2";
+        var $node = me.$node;
+        var nodeText = me.nodeText;
+        var parentRoute = me.parentRoute;
+
+        function constructor(nodeText){
+            var $group=$("<div>").addClass(defaultNodeGroupClass);
+            var $inputGroup=$('<div class="input-group input-group-sm">');
+            var $inputGroupBtnPrev=$('<div class="input-group-btn prev">');
+            var $inputGroupInput=$('<input type="text" class="form-control" aria-label="Text input with multiple buttons">');
+            $inputGroupInput.val(nodeText);
+            var $inputGroupBtnNext=$('<div class="input-group-btn next">');
+            $inputGroupBtnPrev.append(getTransferBtn());
+            $inputGroupBtnPrev.append(getDeleteBtn());
+            $inputGroupBtnNext.append(getPlusBtn());
+            $inputGroupBtnNext.append(getTransferBtn());
+            $inputGroup.append($inputGroupBtnPrev);
+            $inputGroup.append($inputGroupInput);
+            $inputGroup.append($inputGroupBtnNext);
+            $group.append($inputGroup);
+            $node = $group;
+            me.$node = $group;
+//            console.log($group);
+
+            function getDeleteBtn(){
+                var $delBtn=$('<button type="button" class="btn btn-danger shrinkPadding" aria-label="Delete" data-toggle="tooltip" data-placement="top" title="Delete"><span class="glyphicon glyphicon-minus"></span></button>');
+                $delBtn.on('click',delClickFun);
+                $delBtn.tooltip();
+                return $delBtn;
+            }
+            function getPlusBtn(){
+                var $plusBtn=$('<button type="button" class="btn btn-primary shrinkPadding" aria-label="Plus" data-toggle="tooltip" data-placement="top" title="Add Scene Node"><span class="glyphicon glyphicon-plus"></span></button>');
+                $plusBtn.on('click',plusClickFun);
+                $plusBtn.tooltip();
+                return $plusBtn;
+            }
+            function getTransferBtn(){
+                var $transferBtn= $('<button type="button" class="btn btn-primary shrinkPadding" aria-label="Transfer" data-toggle="tooltip" data-placement="top" title="Switch"><span class="glyphicon glyphicon-transfer"></span></button>');
+                $transferBtn.on('click',transferClickFun);
+                $transferBtn.tooltip();
+                return $transferBtn;
+            }
+            return $group;
+        }
+
+        this.setPrevNode = function(prevNode){
+            var oldPrev = me.prevNode;
+            var oldSvgNode = oldPrev ? oldPrev.svgNode : null;
+            var svgNode = me.svgNode;
+
+//            svgNode.setPrev(prevNode.svgNode);
+//            svgNode.setNext(oldSvgNode);
+            if(oldPrev) {
+                prevNode.svgNode.replaceNext(oldSvgNode, svgNode);
+                oldSvgNode.replacePrev(prevNode.svgNode, svgNode);
+            }
+
+            //node relation
+            me.prevNode = prevNode;
+            prevNode.nextNode = me;
+            prevNode.prevNode = oldPrev;
+            if(oldPrev) oldPrev.nextNode = prevNode;
+            //if transfer position , need to remove or replace next node
+            if(me.nextNode && me.nextNode.nodeText===prevNode.nodeText){
+                me.nextNode = prevNode.nextNode?prevNode.nextNode:null;
+            }
+        };
+        this.setNextNode = function(nextNode){
+            var oldNext = me.nextNode;
+            var oldNextSvgNode = oldNext ? oldNext.svgNode : null;
+            var svgNode = me.svgNode;
+
+//            svgNode.setPrev(oldNextSvgNode);
+//            svgNode.setNext(nextNode.svgNode);
+
+            if(oldNext){
+                oldNextSvgNode.replacePrev(svgNode,nextNode.svgNode);
+                svgNode.replaceNext(oldNextSvgNode,nextNode.svgNode);
+            }
+
+            //node relation
+            me.nextNode = nextNode;
+            nextNode.nextNode = oldNext;
+            nextNode.prevNode = me;
+            if(oldNext) oldNext.prevNode = nextNode ;
+            //if transfer position , need to remove or replace previous node
+            if(me.prevNode && me.prevNode.nodeText===nextNode.nodeText){
+                me.prevNode = nextNode.prevNode?nextNode.prevNode:null;
+            }
+        };
+
+        function hindToolTip(){
+            $(".tooltip").hide();
+        }
+
+        function delClickFun(){
+            hindToolTip();
+            var inputGroupCls=".input-group";
+            var $currentGroup=$(this).closest(inputGroupCls).parent();
+            $currentGroup.remove();
+        }
+
+        function plusClickFun(){
+            var $btn=$(this);
+            var isPrev=checkIsPrev($btn);
+            hindToolTip();
+            var sightScene, mySvgNode = me.svgNode,prevNode = me.prevNode,nextNode = me.nextNode;
+            var index = parentRoute.nodeAry.length;
+            var node=Node.apply({
+                nodeText : 'New Node-'+index,
+                parentRoute : parentRoute
+            });
+            var $textNode=node.$node;
+            insertTextNode($btn,$textNode);
+            if(parentRoute) {
+                sightScene = parentRoute.sightScene;
+                parentRoute.nodeAry.push(node);
+//                console.log('parentRoute',parentRoute);
+
+                var x, y,coords,newSvgNode;
+                if(isPrev){
+                    coords = getCoordsBySvgNodes(prevNode.svgNode , mySvgNode);
+
+                }else{
+//                    var nextSvgNode = me.nextNode.svgNode;
+                    coords = getCoordsBySvgNodes(mySvgNode,nextNode.svgNode);
+
+                }
+
+                var nodeInfo={
+                    id: 113, x: coords.x, y: coords.y, text: node.nodeText
+                    ,colorValMain : mySvgNode.colorValMain
+                    ,colorValSub : mySvgNode.colorValSub
+                };
+                newSvgNode = sightScene.createNode(nodeInfo).initFun();
+                node.svgNode = newSvgNode;
+                if(isPrev){
+                    me.setPrevNode(node);
+//                    newSvgNode.setPrev(prevNode.svgNode);
+//                    newSvgNode.setNext(mySvgNode);
+//                    prevNode.svgNode.replaceNext(mySvgNode,newSvgNode);
+//                    mySvgNode.replacePrev(prevNode.svgNode,newSvgNode);
+//                    node.prevNode = prevNode;
+//                    node.nextNode = me;
+                }else{
+                    me.setNextNode(node);
+//                    newSvgNode.setPrev(mySvgNode);
+//                    newSvgNode.setNext(nextNode.svgNode);
+//                    mySvgNode.replaceNext(nextNode.svgNode,newSvgNode);
+//                    nextNode.svgNode.replacePrev(mySvgNode,newSvgNode);
+//                    node.prevNode = me;
+//                    node.nextNode = nextNode;
+                }
+                console.log(111,me);
+
+            }
+
+            function getCoordsBySvgNodes(fromSvgNode,toSvgNode){
+                var x = (fromSvgNode.x+toSvgNode.x)/2;
+                var y = (fromSvgNode.y+toSvgNode.y)/2;
+                return {x:x,y:y};
+            }
+        }
+
+        function checkIsPrev($nodeObj){
+            return $nodeObj.closest(".input-group-btn").hasClass("prev");
+        }
+
+        function insertTextNode($nodeObj,$targetObj){
+            var inputGroupCls=".input-group";
+//            var isPrev=$nodeObj.closest(".input-group-btn").hasClass("prev");
+//            console.log('isPrev',isPrev);
+            var $currentGroup=$nodeObj.closest(inputGroupCls).parent();
+            if(checkIsPrev($nodeObj)){
+                if($targetObj&&$targetObj.length===1)$targetObj.insertBefore($currentGroup);
+            }else{
+                if($targetObj&&$targetObj.length===1)$targetObj.insertAfter($currentGroup);
+            }
+            return $targetObj;
+        }
+
+        function transferClickFun(){
+            hindToolTip();
+            var inputGroupCls=".input-group";
+            var isPrev=$(this).closest(".input-group-btn").hasClass("prev");
+            console.log('isPrev',isPrev);
+            var $currentGroup=$(this).closest(inputGroupCls).parent();
+            var $targetGroup;
+            if(isPrev){
+                $targetGroup = $currentGroup.prev();
+                if($targetGroup&&$targetGroup.length===1){
+                    $currentGroup.insertBefore($targetGroup);
+                    me.setNextNode(me.prevNode);
+                }
+            }else{
+                $targetGroup = $currentGroup.next();
+                if($targetGroup&&$targetGroup.length===1){
+                    $targetGroup.insertBefore($currentGroup);
+                    me.setPrevNode(me.nextNode);
+                }
+            }
+            console.log(me);
+        }
+
+        constructor(nodeText);
+
+        return me;
+    }
+
+    function Route(){
+        var me=this;
+        var nodeTextAry = me.nodes;
         var $routeBtn = me.$routeBtn;
         var $badge = me.$badge;
         var svgNodes = me.svgNodes;
         var $routeDetail = me.$routeDetail;
         var uiControl = me.uiControl;
+        var sightScene = me.sightScene;
+        var $nodeAry = me.$nodeAry;//jQuery Object
+        var nodeAry = me.nodeAry;//Node Object
 
-        function displayNodeText(){
+        function displayNodeInput(){
             $routeDetail.empty();
-            for (var i = 0; i < nodes.length; i++) {
-                var node = nodes[i];
-                uiControl.addNodeInput(node);
+            $routeDetail.append($nodeAry);
+//            console.log('$nodeTextAry',$nodeTextAry);
+        }
+
+        function createNodeInput(){
+            nodeAry = [];
+            $nodeAry = [];
+            var rootNode;
+            for (var i = 0; i < nodeTextAry.length; i++) {
+                var nodeText = nodeTextAry[i];
+                var node=Node.apply({
+                    nodeText : nodeText,
+                    parentRoute : me
+                });
+                nodeAry.push(node);
+//                console.log(node);
+//                var $node = uiControl.addNodeInput(nodeText);
+                var $node = node.$node;
+                node.svgNode=svgNodes[i];
+                $nodeAry.push($node);
+                if(rootNode){
+                    rootNode.nextNode = node;
+                    node.prevNode = rootNode;
+                }else
+                    node.isRoot=true;
+                rootNode = node;
             }
-//            console.log('displayNodeText',$routeDetail);
-//            console.log('uiControl',uiControl);
+            me.$nodeAry = $nodeAry;
+            me.nodeAry = nodeAry;
         }
 
         this.init=function(){
+            uiControl = me.uiControl;
+            sightScene = me.sightScene;
             $routeBtn = me.$routeBtn;
             $badge = me.$badge;
+            me.svgNodes = sightScene.createRoute(me.nodes);
             svgNodes = me.svgNodes;
             $routeDetail = me.$routeDetail;
-            uiControl = me.uiControl;
-//            console.log(me);
-//            console.log(sightScene);
             if($badge){
-                $badge.text(nodes.length);
+                $badge.text(nodeTextAry.length);
             }
-            $routeBtn.find(".editor").parent().on('click',displayNodeText);
+            $routeBtn.find(".editor").parent().on('click',displayNodeInput);
+            createNodeInput();
             return me;
         };
         return this;
@@ -196,37 +434,46 @@ Project Name : WebSandBox
         var defaultRouteBtnClass="btn-group";
         var defaultNodeGroupClass="col-md-2";
         var me=this;
+        me.routeAry=[];
 
         this.drawSvg=function(routes){
             if(!routes||routes.length==0)return;
             for (var i = 0; i < routes.length; i++) {
                 var routeInfo = routes[i];
-                var route = Route.apply(routeInfo);
-                var $routeBtn = me.addRoute(name);
-                var $badge = $routeBtn.find(".badge");
-                route.$routeBtn = $routeBtn;
-                route.$routeDetail=$routeDetail;
-                route.$badge = $badge;
-                route.svgNodes = sightScene.createRoute(route.nodes);
-                route.uiControl = me;
-                route.init();
+                me.addRoute(routeInfo,sightScene);
             }
         };
 
-        this.addNodeInput=function(nodeText){
-            var newNode=createNodeInput(nodeText);
-            $routeDetail.append(newNode);
-        };
+//        this.addNodeInput=function(nodeText){
+//            var newNode=createNodeInput(nodeText);
+////            $routeDetail.append(newNode);
+//            return newNode;
+//        };
 
-        this.addRoute=function(routeName){
-            var $route=$("<div>").addClass(defaultRouteBtnClass);
-            $route.append(getDeleteBtn());
-            $route.append(getMainBtn());
-            $routeMasters.append($route);
+        this.addRoute=function(routeInfo,sightScene){
+            var route = Route.apply(routeInfo);
+            var $routeBtn = getRouteBtn(route.name);
+            var $badge = $routeBtn.find(".badge");
+            route.$routeBtn = $routeBtn;
+            route.$routeDetail=$routeDetail;
+            route.$badge = $badge;
+//            route.svgNodes = sightScene.createRoute(route.nodes);
+            route.sightScene = sightScene;
+            route.uiControl = me;
+            route.init();
+            me.routeAry.push(route);
 
-            return $route;
+            return route;
 
-            function getMainBtn(){
+            function getRouteBtn(routeName){
+                var $route=$("<div>").addClass(defaultRouteBtnClass);
+                $route.append(getDeleteBtn());
+                $route.append(getMainBtn(routeName));
+                $routeMasters.append($route);
+                return $route;
+            }
+
+            function getMainBtn(routeName){
                 var $mainBtn=$('<button class="btn btn-primary" type="button">');
                 if(!routeName) routeName = 'Default Route';
                 $mainBtn.append('<div class="editor" contentEditable=true>'+routeName+'</div>\n');
@@ -235,6 +482,7 @@ Project Name : WebSandBox
 //                $mainBtn.tooltip();
                 return $mainBtn;
             }
+
             function getDeleteBtn(){
                 var $delBtn=$('<button type="button" class="btn btn-danger shrinkPadding" aria-label="Delete" data-toggle="tooltip" data-placement="top" title="Delete"><span class="glyphicon glyphicon-minus"></span></button>');
                 $delBtn.on('click',delRouteClickFun);
@@ -243,9 +491,12 @@ Project Name : WebSandBox
             }
         };
 
-
         function addRouteClickFun(){
-            me.addRoute();
+            var index=me.routeAry.length;
+            me.addRoute({
+                name:'New Route'+index,
+                nodes:['Start'+index,'2nd'+index]
+            });
         }
 
         function createNodeInput(nodeText){
@@ -263,7 +514,7 @@ Project Name : WebSandBox
             $inputGroup.append($inputGroupInput);
             $inputGroup.append($inputGroupBtnNext);
             $group.append($inputGroup);
-            console.log($group);
+//            console.log($group);
 
             function getDeleteBtn(){
                 var $delBtn=$('<button type="button" class="btn btn-danger shrinkPadding" aria-label="Delete" data-toggle="tooltip" data-placement="top" title="Delete"><span class="glyphicon glyphicon-minus"></span></button>');
@@ -433,6 +684,13 @@ Project Name : WebSandBox
         var control=new UIControl(sightScene);
         control.initial(routes);
 //        control.addNodeInput(999);
+//        sightScene.createNode({
+//            id: 'aa', x: 200, y: 300, text: 'tttt'
+//            //,baseX:targetZoneOffset.left
+//            //,baseY:targetZoneOffset.top
+//            ,colorValMain:"rgba(128, 0, 128,1)"
+//            ,colorValSub:"rgba(128, 0, 128,0.5)"
+//        }).initFun();
 
     });
 </script>
