@@ -142,6 +142,48 @@ function SightScene(setting){
         //Ctrl Line Object
         this.prev=[];
         this.next=[];
+
+        var replaceSvgNode=function(svgNodeAry,rmv,rep){
+            var retAry=[];
+            for (var i = 0; i < svgNodeAry.length; i++) {
+                var svgNode = svgNodeAry[i];
+                if(svgNode.text === rmv.text){
+                    retAry.push(rep);
+                    continue;
+                }
+                retAry.push(svgNode);
+            }
+            return retAry;
+        };
+
+        this.containNode=function(type,node){
+            var ary = (type === 'prev'?me.prev:me.next);
+            for (var i = 0; i < ary.length; i++) {
+                var text = ary[i].text;
+                if(node.text === text ){
+                    return true;
+                }
+            }
+            return false;
+        };
+
+        this.replaceNext=function(rmv,rep){
+            if(me.containNode('prev',rmv)){
+                me.next = replaceSvgNode(me.next,rmv,rep);
+            }else{
+                me.setNext(rep);
+            }
+            rep.setPrev(me);
+        };
+        this.replacePrev=function(rmv,rep){
+            if(me.containNode('prev',rmv)){
+                me.prev = replaceSvgNode(me.next,rmv,rep);
+            }else{
+                me.setPrev(rep);
+            }
+            rep.setNext(me);
+        };
+
         this.getPrev=function(){
             return this.prev;
         };
@@ -239,10 +281,10 @@ function SightScene(setting){
             outerCircle = svg.append("circle").attr(outerInfo).call(drag);
             textZone = svg.append("text").attr(textInfo).text(text);
             drag.on("dragstart", function() {
-                    //console.log('xy',me.x+","+me.y);
-                    //console.log('xy',d3.event.sourceEvent.pageX+","+d3.event.sourceEvent.pageY);
-                    //console.log('xy',d3.event.sourceEvent.clientX-me.baseX+","+d3.event.sourceEvent.clientY);
-                    //console.log('me',me.x+','+me.y);
+                //console.log('xy',me.x+","+me.y);
+                //console.log('xy',d3.event.sourceEvent.pageX+","+d3.event.sourceEvent.pageY);
+                //console.log('xy',d3.event.sourceEvent.clientX-me.baseX+","+d3.event.sourceEvent.clientY);
+                //console.log('me',me.x+','+me.y);
             });
             drag.on("drag", function() {
                 d3.event.sourceEvent.stopPropagation(); // silence other listeners
@@ -260,6 +302,7 @@ function SightScene(setting){
             d3Objs.push(outerCircle);
             d3Objs.push(textZone);
             if(isNeedOutCircle)createAddNodes(drag);
+            return me;
         };
 //            initFun();
         return this;
@@ -276,7 +319,7 @@ function SightScene(setting){
         if(nextNodes&&nextNodes.length>0){
             for (var i = 0; i < nextNodes.length; i++) {
                 var nextNode = nextNodes[i];
-                console.log('root',root.colorValMain);
+                //console.log('root',root.colorValMain);
                 var attrs={
                     points:getLinePoints(root,nextNode)
                     ,stroke:"rgba(128, 0, 128,1)"
@@ -321,6 +364,12 @@ function SightScene(setting){
             }
         }
     };
+    this.createNode=function(nodeInfo){
+        nodeInfo.baseX = targetZoneOffset.left;
+        nodeInfo.baseY = targetZoneOffset.top;
+        var node = SceneNode.apply(nodeInfo, [svg]);
+        return node;
+    };
     var routeList=[];//紀錄執行過幾個路徑
     var sceneMap={};//保留相同名稱的節點，用以判斷是否需要合併
     this.createRoute = function(sceneAry){
@@ -338,13 +387,13 @@ function SightScene(setting){
             var node=sceneMap[sceneKey];
             var nodeInfo={
                 id: id, x: x, y: y, text: sceneKey
-                ,baseX:targetZoneOffset.left
-                ,baseY:targetZoneOffset.top
+                //,baseX:targetZoneOffset.left
+                //,baseY:targetZoneOffset.top
                 ,colorValMain:colorValMain
                 ,colorValSub:colorValSub
             };
             if(!node){
-                node = SceneNode.apply(nodeInfo, [svg]);
+                node = me.createNode(nodeInfo);//SceneNode.apply(nodeInfo, [svg]);
                 sceneMap[sceneKey] = node;
             }else{
                 node.addNodeInfo(nodeInfo);
@@ -375,4 +424,5 @@ function SightScene(setting){
             }
         }
     };
+
 }
