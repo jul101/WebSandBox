@@ -1,0 +1,40 @@
+<div class="field-name">{{label}}{{control.valid}}</div>
+<ng-container [ngSwitch]="type">
+  <div *ngSwitchCase="'text'">
+    <div *ngIf="editable" class="display">
+      <b>{{fieldValue}}</b>
+    </div>
+    <div *ngIf="!editable" class="form-group editor">
+      <input type="text" class="form-control" [formControl]="control" >
+    </div>
+  </div>
+  <div *ngSwitchCase="'select'">
+    <div *ngIf="editable" class="display">
+      <b>{{fieldValue}}</b>
+    </div>
+    <div *ngIf="!editable" class="form-group editor">
+      <select  class="form-control" [formControl]="control">
+        <option *ngFor="let item of items" value="{{item.id}}">{{item.label}}</option>
+      </select>
+    </div>
+  </div>
+  <div *ngSwitchDefault>default-content</div>
+</ng-container>
+
+<div [hidden]="control.valid || control.untouched" 
+  style="
+    background-color: #f2dede;
+    border-color: #ebcccc;
+    color: #a94442;
+  "
+  class="alert alert-dange">
+  <div [hidden]="!control.hasError('required')" >
+    The <b>{{label}}</b> is required.
+  </div>
+</div>
+
+
+
+<!--<ng-content *ngIf="editable"></ng-content>-->
+
+

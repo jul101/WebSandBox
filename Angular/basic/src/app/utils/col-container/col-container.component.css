@@ -1,0 +1,18 @@
+/* field value is valid */
+.ng-valid {}
+
+/* field value is invalid */
+.ng-invalid {}
+
+/* field has not been clicked in, tapped on, or tabbed over */
+.ng-untouched {}
+
+/* field has been previously entered */
+.ng-touched {}
+
+/* field value is unchanged from the default value */
+.ng-pristine {}
+
+/* field value has been modified from the default */
+.ng-dirty {}
+

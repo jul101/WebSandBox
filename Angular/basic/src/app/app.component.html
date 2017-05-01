@@ -1,0 +1,79 @@
+<div class="jumbotron">
+  <h1>
+    {{title}}
+  </h1>
+  <pre>
+    {{inputMsg}}
+    {{myForm.getRawValue() | json}}
+  </pre>
+
+  <div *ngIf="disabled" class="display">
+    A
+  </div>
+  <div *ngIf="!disabled" class="display">
+    B
+  </div>
+
+</div>
+<div class="container">
+  <div class="row">
+    <div class="form-group col-md-12">
+      <input type="text" class="form-control" [(ngModel)]="inputMsg">
+    </div>
+    <div class="form-group col-md-12">
+      <button type="button" class="btn btn-primary"
+        [(ngModel)]="singleModel" btnCheckbox
+        btnCheckboxTrue="1" btnCheckboxFalse="0" (click)="clearMsg($event)">
+      Single Toggle
+      </button>
+      <button type="button" class="btn btn-primary" (click)="toggleEditable()">
+       Edit({{disabled}})
+       </button>
+    </div>
+    <app-col-container 
+      [fieldName]="fieldName" 
+      [fieldValue]="fieldValue" 
+      [editable]="!disabled" 
+      class="col-md-3">
+      <input type="text" class="form-control" [(ngModel)]="fieldValue">
+    </app-col-container>
+  </div>
+  <hr>
+  <h3>Form Sample</h3>
+  <form action="" [formGroup]="myForm">
+    <div class="row"> 
+      <app-col-container
+        [control]="myForm.get('custName')"
+        name="custName"
+        label="Customer Name"
+        type="text"
+        class="col-md-3"
+        [editable]="!disabled"
+      >
+      <!--<input type="text">-->
+      </app-col-container>
+      <app-col-container
+        [control]="myForm.get('region')"
+        name="region"
+        label="Region"
+        type="text"
+        class="col-md-3"
+        [editable]="!disabled"
+      >
+      <!--<input type="text">-->
+      </app-col-container>
+      <app-col-container
+        [control]="myForm.controls.gender"
+        name="gender"
+        label="Gender"
+        type="select"
+        class="col-md-3"
+        [items]="genderList"
+        [editable]="!disabled"
+      >
+      <!--<input type="text">-->
+      </app-col-container>
+
+   </div>
+  </form>
+</div>
