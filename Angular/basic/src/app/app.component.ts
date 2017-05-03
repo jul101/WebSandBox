@@ -1,12 +1,16 @@
-import { Component } from '@angular/core';
+import { Component,OnInit  } from '@angular/core';
 import { Validators, FormGroup, FormControl, FormBuilder } from '@angular/forms';
+import { Hero } from './hero';
+// import { HEROES } from './mock-heroes';
+import { HeroService } from './hero.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
+  providers: [HeroService]
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'app works!';
   inputMsg:string = '';
   fieldName:string='name';
@@ -24,9 +28,14 @@ export class AppComponent {
     this.disabled=!this.disabled;
   }
 
-  constructor(private builder: FormBuilder){
+  constructor(private builder: FormBuilder,private heroService: HeroService){
     // this.myForm.getRawValue();
   }
+
+  ngOnInit(): void {
+    this.getHeroes();
+  }
+
 
   custName:string='Rock';
   region:string='USA';
@@ -43,6 +52,24 @@ export class AppComponent {
     {id:"2",label:'Female'},
     {id:"0",label:'Half'},
   ];
+
+  hero: Hero = {
+    id: 1,
+    name: 'Windstorm'
+  };
+
+  heroes: Hero[];
+  selectedHero: Hero;
+
+  onSelectHero(hero:Hero){
+    this.selectedHero = hero;
+  }
+
+  getHeroes(): void {
+    // this.heroes = this.heroService.getHeroes();
+    // this.heroService.getHeroes().then(heroes => this.heroes = heroes);
+    this.heroService.getHeroesSlowly().then(heroes => this.heroes = heroes);
+  }
   
 
 }
